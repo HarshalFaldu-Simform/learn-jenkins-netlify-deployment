@@ -6,8 +6,6 @@ pipeline {
         NETLIFY_AUTH_TOKEN = credentials('netlify-token')
     }
 
-    // test trigger
-
     stages {
         stage('Build') {
             agent {
