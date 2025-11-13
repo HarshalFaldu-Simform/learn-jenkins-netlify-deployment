@@ -1,5 +1,10 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'node:18'
+            reuseNode true
+        }
+    }
 
     environment {
         NETLIFY_SITE_ID = '6d47872b-6f47-4f25-a087-28e3c595c1ac'
@@ -9,12 +14,6 @@ pipeline {
 
     stages {
         stage('Build') {
-            agent {
-                docker {
-                    image 'node:18'
-                    reuseNode true
-                }
-            }
 
             steps {
                 sh '''
@@ -29,13 +28,6 @@ pipeline {
         }
 
         stage('Test') {
-            agent {
-                docker {
-                    image 'node:18'
-                    reuseNode true
-                }
-            }
-
             steps {
                 sh '''
                     test -f build/index.html
@@ -44,28 +36,15 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
-            agent {
-                docker {
-                    image 'node:18'
-                    reuseNode true
-                }
-            }
-
+        stage('Deployment') {
             steps {
                 sh '''
                     npm install netlify-cli
                     node_modules/.bin/netlify --version
                     node_modules/.bin/netlify status
-                    node_modules/.bin/netlify deploy --dir=build --prod
+                    node_modules/.bin/netlify deploy --dir=build --prod 
                 '''
             }
-        }
-    }
-
-    post {
-        always {
-            junit 'jest-results/junit.xml'
         }
     }
 }
